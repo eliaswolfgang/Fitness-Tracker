@@ -27,9 +27,13 @@ router.post("/api/workouts", async (req, res) => {
 
 router.put("/api/workouts/:id", async (req, res) => {
     try {
-        let newExercise = await Workout.updateOne(
-            {_id: mongoose.ObjectId(req.params.id)},
-            {$push: {exercises: req.body}},
+        let newExercise = await Workout.findOneAndUpdate(
+            {_id: req.params.id},
+            {
+                $push: {exercises: req.body},
+                $inc: {totalDuration: req.body.duration}
+            },
+            {new: true}
         );
             res.json(newExercise);
     } catch (err) {
@@ -37,9 +41,21 @@ router.put("/api/workouts/:id", async (req, res) => {
     }
 });
 
-// router.get("/api/workouts/range", async (req, res) => {
-
-// })
+router.get("/api/workouts/range", async (req, res) => {
+    try {
+        const inRange = await Workout.find({}).sort({ day: 1 });
+        inRange.forEach((workout) => {
+          let total = 0;
+          workout.exercises.forEach((e) => {
+            total += e.duration;
+          });
+          workout.totalDuration = total;
+        });
+        res.json(inRange);
+      } catch (err) {
+        console.error(err);
+      }
+});
 
 // HTML Routes
 router.get("/", (req, res) => {
