@@ -8,7 +8,7 @@ const mongoose = require("mongoose");
 router.get("/api/workouts", async (req, res) => {
     let workouts;
     try {
-       workouts = await Workout.find({}).sort({"day": -1});
+       workouts = await Workout.find({}).sort({day: -1});
        res.send(workouts);
     } catch (err) {
         console.error(err);
@@ -29,12 +29,10 @@ router.put("/api/workouts/:id", async (req, res) => {
     try {
         let newExercise = await Workout.updateOne(
             {_id: mongoose.ObjectId(req.params.id)},
-            {$push: {
-                exercises: req.body
-            }}
+            {$push: {exercises: req.body}},
+            {upsert: false}
         );
-        console.log("Added exercise!");
-        res.send(newExercise);
+            res.json(newExercise);
     } catch (err) {
         console.error(err);
     }
