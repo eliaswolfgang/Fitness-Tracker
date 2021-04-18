@@ -30,7 +30,6 @@ router.put("/api/workouts/:id", async (req, res) => {
         let newExercise = await Workout.updateOne(
             {_id: mongoose.ObjectId(req.params.id)},
             {$push: {exercises: req.body}},
-            {upsert: false}
         );
             res.json(newExercise);
     } catch (err) {
